@@ -107,33 +107,33 @@ public class FPSDisplay : GameObjectBehavior {
         ++frames;
 
         // Interval ended - update GUI text and start new interval
-        if (timeleft <= 0.0) {
+        if (timeleft > 0.0) {
             // display two fractional digits (f2 format)
-            float fps = accum / frames;
-            lastFPS = fps;
-
-            if (labelFPS != null) {
-
-                string format = System.String.Format("{0:F2} FPS", fps);
-
-                UIUtil.SetLabelValue(labelFPS, format);
-
-                if (fps < 27) {
-                    labelFPS.color = Color.Lerp(labelFPS.color, Color.yellow, Time.deltaTime);
-                }
-                else {
-                    if (fps < 10) {
-                        labelFPS.color = Color.Lerp(labelFPS.color, Color.red, Time.deltaTime);
-                    }
-                    else {
-                        labelFPS.color = Color.Lerp(labelFPS.color, Color.green, Time.deltaTime);
-                        //  DebugConsole.Log(format,level);
-                        timeleft = updateInterval;
-                        accum = 0.0F;
-                        frames = 0;
-                    }
-                }
-            }
+            return;
         }
+        float fps = accum / frames;
+        lastFPS = fps;
+
+        if (labelFPS == null) {
+            return;
+        }
+        string format = System.String.Format("{0:F2} FPS", fps);
+
+        UIUtil.SetLabelValue(labelFPS, format);
+
+        if (fps >= 27) {
+            if (fps >= 10) {
+                labelFPS.color = Color.Lerp(labelFPS.color, Color.green, Time.deltaTime);
+                //  DebugConsole.Log(format,level);
+                timeleft = updateInterval;
+                accum = 0.0F;
+                frames = 0;
+                return;
+            }
+            labelFPS.color = Color.Lerp(labelFPS.color, Color.red, Time.deltaTime);
+            return;
+        }
+        labelFPS.color = Color.Lerp(labelFPS.color, Color.yellow, Time.deltaTime);
+
     }
 }
