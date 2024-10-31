@@ -99,33 +99,28 @@ public class Draggable : GameObjectBehavior {
     public void Grab() {
         if(grabbed) {
             grabbed = null;
+            return;
         }
-        else {
-            RaycastHit hit;
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if(Physics.Raycast(ray, out hit)) {
-                grabbed = hit.transform;
-                if(grabbed.tag == "drag" || grabbed.parent.tag == "drag") {
-                    if(grabbed.parent) {
-                        grabbed = grabbed.parent.transform;
-                    }
-                    //set the object to ignore raycasts
-                    grabLayerMask = grabbed.gameObject.layer;
-                    grabbed.gameObject.layer = 2;
-                    //now immediately do another raycast to calculate the offset
-                    if(Physics.Raycast(ray, out hit)) {
-                        grabOffset = grabbed.position - hit.point;
-                    }
-                    else {
-                        //important - clear the gab if there is nothing
-                        //behind the object to drag against
-                        grabbed = null;
-                    }
-                }
-                else {
-                    grabbed = null;
-                }
+        RaycastHit hit;
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        if(Physics.Raycast(ray, out hit)) {
+            grabbed = hit.transform;
+            if(grabbed.tag != "drag" && grabbed.parent.tag != "drag") {
+                grabbed = null;
+                return;
             }
+            if(grabbed.parent) {
+                grabbed = grabbed.parent.transform;
+            }
+            //set the object to ignore raycasts
+            grabLayerMask = grabbed.gameObject.layer;
+            grabbed.gameObject.layer = 2;
+            //now immediately do another raycast to calculate the offset
+            if(!Physics.Raycast(ray, out hit)) {
+                grabbed = null;
+                return;
+            }
+            grabOffset = grabbed.position - hit.point;
         }
     }
 
